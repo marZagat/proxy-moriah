@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles.css">
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,700|Roboto:400,700" rel="stylesheet">
     <link rel="icon" href="http://res.cloudinary.com/madlicorice/image/upload/v1520448614/WeGot-favicon.ico" type="image/x-icon">
     <title>WeGot</title>
@@ -11,7 +13,7 @@
     <div id="container">
       <div id="gallery-app"></div>
       <div id="middle">
-        <div id="overview-app"></div>
+        <div id="overview"></div>
         <div id="sidebar-app"></div>
       </div>
       <div id="recommendations-app"></div>
@@ -20,5 +22,11 @@
     <!-- <script src="http://184.169.248.150/restaurants/id/bundle.js"></script>
     <script src="http://54.177.233.239/bundle.js"></script>
     <script src="http://52.89.102.101/bundle.js"></script> -->
+    <script>
+      ReactDOM.render(
+        React.createElement(Overview),
+        document.getElementById('overview')
+      );
+    </script>
   </body>
 </html>
