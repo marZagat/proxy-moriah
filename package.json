@@ -20,6 +20,7 @@
   "homepage": "https://github.com/bamboo-connection/proxy-server-stacy#readme",
   "dependencies": {
     "express": "^4.16.2",
+    "fs-extra": "^5.0.0",
     "morgan": "^1.9.0",
     "request": "^2.83.0"
   }
