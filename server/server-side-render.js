@@ -38,4 +38,4 @@ const createStaticPage = (services, pageTitle, id) => {
   );
 };
 
-module.exports = createStaticPage;
+module.exports = { SERVICES, createStaticPage };

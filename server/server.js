@@ -1,11 +1,17 @@
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
-const services = require('./microservices/service-config');
+const { SERVICES, createStaticPage } = require('./server-side-render');
+
+const PAGE_TITLE = 'marZagat';
 
 const app = express();
 app.use(morgan('dev'));
-app.use('/restaurants/:id', express.static(path.resolve(__dirname, 'public')));
+
+app.get('/restaurants/:id', (req, res) => {
+  const html = createStaticPage(SERVICES, PAGE_TITLE, req.params.id);
+  res.send(html);
+})
 
 app.get('/', (req, res) => {
   const randomId = Math.floor(Math.random() * 10000000);
