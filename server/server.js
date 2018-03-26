@@ -17,6 +17,6 @@ app.get('/api/restaurants/:id/:serviceName', ({ params: { id, serviceName } }, r
   res.redirect(`http://${ ADDRESSES[service] }/api/restaurants/${ id }/${ serviceName }`)
 });
 
-app.listen(port, () => {
+app.listen(3000, () => {
   console.log(`server running at: http://localhost:3000`)
 });
