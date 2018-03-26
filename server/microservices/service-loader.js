@@ -1,24 +1,23 @@
-const fs = require('fs-extra'); // promisified fs
+const fs = require('fs');
 const fetch = require('node-fetch');
 const Promise = require('bluebird');
 const path = require('path');
 const url = require('url');
 
-const loadServiceComponent = (serviceCacheObj, serviceFilePath) => {
-  console.log(`loading service from ${serviceFilePath}`);
-  serviceCacheObj.reactComponent = require(serviceFilePath).default;
+const loadServiceReactComponent = (serviceCache, serviceFilePath) => {
+  console.log(`caching React component '${serviceCache.reactComponentName}' from ${serviceFilePath}`);
+  serviceCache.reactComponent = require(serviceFilePath).default;
 };
 
-const fetchFile = (fromAddress, fileName, toFolder) => {
+const fetchFile = (fromAddress, fileName, toPath) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const url = url.resolve(fromAddress, fileName);
-      const fileContents = await fetch(url);
+      const fileUrl = url.resolve(fromAddress, fileName);
+      const fileContents = await fetch(fileUrl);
       
-      const outputFilePath = path.resolve(toFolder, fileName);
-      const destination = fs.createWriteStream(outputFilePath);
+      const destination = fs.createWriteStream(toPath);
       fileContents.body.pipe(destination);
-      fileContents.body.on('close', () => {
+      destination.on('close', () => {
         resolve();
       });
     } catch (error) {
@@ -27,17 +26,28 @@ const fetchFile = (fromAddress, fileName, toFolder) => {
   });
 };
 
-const fetchBundleFiles = (outputFolders, services, needToRequire) => {
-  const serviceNames = Object.keys(services);
+const fetchBundleFiles = async (clientToFolder, serverToFolder, services) => {
+  try {
+    const serviceNames = Object.keys(services);
+  
+    const fileFetchPromises = serviceNames.map(async (serviceName) => {
+      const serviceCache = services[serviceName];
+      const { address, clientBundleName, serverBundleName } = serviceCache;
+      const clientToPath = path.resolve(clientToFolder, `${serviceName}.js`);
+      const serverToPath = path.resolve(serverToFolder, `${serviceName}.node.js`);
+      
+      await Promise.all([
+        fetchFile(address, clientBundleName, clientToPath),
+        fetchFile(address, serverBundleName, serverToPath),
+      ]);
+      loadServiceReactComponent(serviceCache, serverToPath);
+    });
 
-  serviceNames.forEach((serviceName) => {
-    const service = services[serviceName];
-    const { address, clientBundleName, serverBundleName } = service;
-
-    await Promise.all([
-      fetchBundleFile(address, clientBundleName, outputFolders.client),
-      fetchBundleFile(address, serverBundleName, outputFolders.server),
-    ]);
-    loadServiceComponent(service, path.resolve(outputFolders.server, serverBundleName));
-  });
+    await Promise.all(fileFetchPromises);
+    return Promise.resolve(services);
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
+
+module.exports = fetchBundleFiles;
