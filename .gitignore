@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# files generated for server-side rendering
+public/services/*
+templates/services/*
